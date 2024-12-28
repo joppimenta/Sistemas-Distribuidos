@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package system;
+
+// Definição de um dispositivo inteligente
+message DeviceInfo {
+    string device_id = 1;
+    string device_type = 2;
+    string ip = 3;
+    int32 port = 4;
+    string state = 5;  // Estado do dispositivo (ligado/desligado)
+}
+
+// Comando de controle de um dispositivo
+message DeviceControl {
+    string device_id = 1;
+    string action = 2;  // Ação (ligar/desligar)
+}
