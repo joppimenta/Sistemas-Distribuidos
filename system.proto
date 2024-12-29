@@ -9,10 +9,12 @@ message DeviceInfo {
     string ip = 3;
     int32 port = 4;
     string state = 5;  // Estado do dispositivo (ligado/desligado)
+    float temperature = 6; // Temperatura atual (aplicável ao ar-condicionado)
 }
 
 // Comando de controle de um dispositivo
 message DeviceControl {
     string device_id = 1;
-    string action = 2;  // Ação (ligar/desligar)
+    string action = 2;  // Ação (ligar/desligar/ajustar_temperatura)
+    float temperature = 3; // Temperatura desejada (apenas para ajustar_temperatura)
 }

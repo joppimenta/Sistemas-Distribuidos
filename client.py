@@ -1,6 +1,5 @@
 import socket
 import system_pb2  # Arquivo gerado a partir de system.proto
-import time
 
 
 class Client:
@@ -21,9 +20,7 @@ class Client:
     def list_devices(self):
         # Solicita ao Gateway a lista de dispositivos conectados
         try:
-            # Envia o comando para listar dispositivos
             self.socket.sendall(b"LIST_DEVICES")
-            # Recebe a resposta com a lista de dispositivos
             data = self.socket.recv(1024)
             print("Dispositivos conectados:")
             print(data.decode())
@@ -31,29 +28,64 @@ class Client:
             print(f"Erro ao listar dispositivos: {e}")
 
     def control_device(self):
-        # Envia um comando para controlar um dispositivo
-        device_id = input("Informe o ID do dispositivo que deseja controlar: ")
-        action = input("Informe a ação (ligar/desligar): ").lower()
-
-        if action not in ['ligar', 'desligar']:
-            print("Ação inválida.")
-            return
-
         try:
-            # Cria a mensagem Protobuf para enviar ao Gateway
+            # Solicita a lista de dispositivos para exibição
+            self.list_devices()
+
+            device_type = input("Qual dispositivo deseja controlar? (Lampada/Sensor/Ar-Condicionado): ").lower()
+
+            if device_type not in ["lampada", "sensor", "ar-condicionado"]:
+                print("Tipo de dispositivo inválido.")
+                return
+
+            # Determina o ID do dispositivo com base no tipo
+            device_id = {"lampada": "1", "sensor": "2", "ar-condicionado": "3"}.get(device_type)
+
+            action = input("Deseja ligar ou desligar o dispositivo? (ligar/desligar): ").lower()
+            if action not in ["ligar", "desligar"]:
+                print("Ação inválida.")
+                return
+
+            # Controle adicional para ar-condicionado
+            temperature = None
+            if device_type == "ar-condicionado":
+                if action == "ligar":
+                    temp_control = input("Deseja ajustar a temperatura? (sim/não): ").lower()
+                    if temp_control == "sim":
+                        try:
+                            temperature = float(input("Informe a temperatura desejada (em °C): "))
+                            if temperature < 16 or temperature > 30:
+                                print("Temperatura fora do intervalo permitido (16°C - 30°C).")
+                                return
+                        except ValueError:
+                            print("Temperatura inválida.")
+                            return
+                elif action == "desligar":
+                    print("Desligando o ar-condicionado. Não será possível ajustar a temperatura.")
+                else:
+                    temp_control = input("Deseja controlar a temperatura do ar-condicionado? (sim/não): ").lower()
+                    if temp_control == "sim":
+                        print("O ar-condicionado está desligado. Ligue o aparelho antes de ajustar a temperatura.")
+                        return
+
+            # Criação da mensagem Protobuf
             control_message = system_pb2.DeviceControl(
                 device_id=device_id,
-                action=action
+                action=action,
+                temperature=temperature if temperature is not None else 0.0
             )
-            # Serializa a mensagem
-            message = control_message.SerializeToString()
-            # Envia o comando de controle
-            self.socket.sendall(message)
-            print(f"Comando '{action}' enviado para o dispositivo {device_id}.")
 
-            # Aguarda a resposta do Gateway
+            # Serialização e envio da mensagem
+            message = control_message.SerializeToString()
+            self.socket.sendall(message)
+            print(f"Comando enviado: {action} para o dispositivo {device_type}.")
+            if temperature is not None:
+                print(f"Temperatura ajustada para: {temperature}°C.")
+
+            # Recebendo a resposta do Gateway
             response = self.socket.recv(1024)
             print(f"Resposta do Gateway: {response.decode()}")
+
         except Exception as e:
             print(f"Erro ao enviar comando: {e}")
 
@@ -88,5 +120,5 @@ class Client:
 
 
 if __name__ == "__main__":
-    client = Client("localhost", 5000)
+    client = Client("192.168.18.45", 5000)
     client.run()
