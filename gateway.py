@@ -20,7 +20,7 @@ class Gateway:
         multicast_message = "DISCOVER_DEVICES".encode()
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP) as multicast_socket:
             multicast_socket.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 2)
-            multicast_socket.sendto(multicast_message, (self.multicast_group, self.multicast_port))
+            multicast_socket.sendto(multicast_message, (self.multicast_group, self.multicast_port))  # Usando o multicast_group e a porta configurados
         print("Mensagem multicast de descoberta enviada.")
 
     def listen_for_device_responses(self):
@@ -134,5 +134,5 @@ class Gateway:
 
 
 if __name__ == "__main__":
-    gateway = Gateway(ip="192.168.18.45", port=5000, multicast_group="224.0.0.1", multicast_port=10001)
+    gateway = Gateway(ip="172.31.40.12", port=5000, multicast_group="224.0.0.1", multicast_port=10001)
     gateway.start()

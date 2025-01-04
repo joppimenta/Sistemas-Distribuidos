@@ -9,7 +9,7 @@ class SmartDevice:
         self.device_type = device_type
         self.ip = ip
         self.port = port
-        self.gateway_ip = '192.168.18.45'  # Pode ser alterado para o IP real do Gateway
+        self.gateway_ip = '172.31.40.12'  # Pode ser alterado para o IP real do Gateway
         self.gateway_port = 5000
         self.multicast_group = '224.0.0.1'
         self.multicast_port = 10001
@@ -25,11 +25,12 @@ class SmartDevice:
             port=self.port,
             state="on"  # Exemplo de estado do dispositivo
         )
+        
         print(f"Enviando dados para : {addr}")
 
         # Envia via UDP para o Gateway
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
-            sock.sendto(device_info.SerializeToString(), ('192.168.18.45', 10001))
+            sock.sendto(device_info.SerializeToString(), (self.gateway_ip, self.multicast_port))  # Envia para o gateway
 
     def listen_for_multicast(self):
         """Escuta mensagens multicast do Gateway."""
