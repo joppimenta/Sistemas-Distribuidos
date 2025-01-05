@@ -72,12 +72,12 @@ class ClientApp:
     def list_devices(self):
         try:
             self.socket.sendall(b"LIST_DEVICES")
-            data = self.socket.recv(4096)  # Ajustar tamanho do buffer conforme necessário
+            data = self.socket.recv(4096)
             devices = data.decode().split("\n")
 
-            self.device_listbox.delete(0, tk.END)  # Limpa a lista
+            self.device_listbox.delete(0, tk.END)
             connected_devices = []
-            self.devices.clear()  # Limpa o dicionário de dispositivos
+            self.devices.clear()
 
             for device in devices:
                 if device:
@@ -85,13 +85,13 @@ class ClientApp:
                     partes = device.split(", ")
                     tipo = partes[1].split(": ")[1]
                     device_id = partes[0].split(": ")[1]
-                    self.devices[tipo.lower()] = device_id  # Adiciona o dispositivo e seu ID no dicionário
+                    self.devices[tipo.lower()] = device_id
                     connected_devices.append(tipo)
 
             # Atualiza o dropdown de tipo de dispositivo com os nomes dos dispositivos conectados
             self.device_type_combobox["values"] = connected_devices
             if connected_devices:
-                self.device_type_combobox.current(0)  # Seleciona o primeiro dispositivo por padrão
+                self.device_type_combobox.current(0)
             else:
                 self.device_type_combobox.set("")  # Reseta o valor caso não haja dispositivos conectados
         except Exception as e:
