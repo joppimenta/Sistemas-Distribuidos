@@ -76,7 +76,7 @@ class Gateway:
                     with self.lock:
                         devices_list = "\n".join(
                             [f"ID: {dev.device_id}, Tipo: {dev.device_type}, Estado: {dev.state}, "
-                             f"Temperatura: {dev.temperature if dev.device_type == 'air-conditioner' else 'N/A'}"
+                             f"Temperatura: {dev.temperature if dev.device_type == 'Ar-Condicionado' else 'N/A'}"
                              for dev in self.devices.values()]
                         )
                     client_socket.sendall(devices_list.encode())
@@ -98,7 +98,7 @@ class Gateway:
                                 device.state = "off"
 
                             # Controle de temperatura para dispositivos de ar-condicionado
-                            if device.device_type == "air-conditioner" and action == "ligar":
+                            if device.device_type == "Ar-Condicionado" and action == "ligar":
                                 if 16 <= temperature <= 30:
                                     device.temperature = temperature
                                     client_socket.sendall(
@@ -134,5 +134,5 @@ class Gateway:
 
 
 if __name__ == "__main__":
-    gateway = Gateway(ip="172.31.40.12", port=5000, multicast_group="224.0.0.1", multicast_port=10001)
+    gateway = Gateway(ip="192.168.18.45", port=5000, multicast_group="224.0.0.1", multicast_port=10001)
     gateway.start()

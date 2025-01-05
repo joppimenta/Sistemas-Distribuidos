@@ -4,12 +4,18 @@ import threading
 
 
 class SmartDevice:
-    def __init__(self, device_id, device_type, ip, port, initial_temperature = None):
-        self.device_id = device_id
+    # Variável de classe para controlar o ID do dispositivo
+    device_counter = 0
+
+    def __init__(self, device_type, ip, port, initial_temperature=None):
+        # Gera o ID automaticamente
+        self.device_id = str(SmartDevice.device_counter + 1)
+        SmartDevice.device_counter += 1  # Incrementa o contador para o próximo dispositivo
+
         self.device_type = device_type
         self.ip = ip
         self.port = port
-        self.gateway_ip = '172.31.40.12'  # Pode ser alterado para o IP real do Gateway
+        self.gateway_ip = '192.168.18.45'  # Pode ser alterado para o IP real do Gateway
         self.gateway_port = 5000
         self.multicast_group = '224.0.0.1'
         self.multicast_port = 10001
@@ -23,9 +29,10 @@ class SmartDevice:
             device_type=self.device_type,
             ip=self.ip,
             port=self.port,
-            state="on"  # Exemplo de estado do dispositivo
+            state="on",
+            temperature=self.temperature
         )
-        
+
         print(f"Enviando dados para : {addr}")
 
         # Envia via UDP para o Gateway
@@ -63,17 +70,19 @@ class SmartDevice:
         self.running = False
 
 
-# Inicialização dos dispositivos IOT
-lamp = SmartDevice("1", 'Lampada', 'localhost', 6000)
-sensor = SmartDevice("2", 'Sensor', 'localhost', 6001)
-air_conditioner = SmartDevice("3", 'Ar-Condicionado', 'localhost', 6002, 25)
+# Inicialização dos dispositivos IOT (sem precisar passar o ID manualmente)
+lamp = SmartDevice('Lampada', 'localhost', 6000)
+sensor = SmartDevice('Sensor', 'localhost', 6001)
+air_conditioner = SmartDevice('Ar-Condicionado', 'localhost', 6002, 25)
+som = SmartDevice('Som', 'localhost', 6003)
 
 # Inicia a escuta de multicast em threads separadas
 lamp_thread = threading.Thread(target=lamp.listen_for_multicast)
 sensor_thread = threading.Thread(target=sensor.listen_for_multicast)
 air_conditioner_thread = threading.Thread(target=air_conditioner.listen_for_multicast)
+som_thread = threading.Thread(target=som.listen_for_multicast)
 
 lamp_thread.start()
 sensor_thread.start()
 air_conditioner_thread.start()
-
+som_thread.start()
