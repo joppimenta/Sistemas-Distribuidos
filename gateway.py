@@ -135,5 +135,5 @@ class Gateway:
 
 
 if __name__ == "__main__":
-    gateway = Gateway(ip='172.31.103.163', port=5000, multicast_group="224.0.0.1", multicast_port=10001)
+    gateway = Gateway(ip='172.24.145.231', port=5000, multicast_group="224.0.0.1", multicast_port=10001)
     gateway.start()

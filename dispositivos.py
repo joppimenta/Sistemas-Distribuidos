@@ -4,17 +4,18 @@ import system_pb2  # Arquivo gerado a partir de system.proto
 
 class SmartDevice:
     # Variável de classe para controlar o ID do dispositivo
-    device_counter = 0
+    device_ids = {"Sensor": "1", "Som": "2", "Lampada": "3", "Ar-Condicionado": "4"}
 
     def __init__(self, device_type, ip, port, initial_temperature=None):
-        # Gera o ID automaticamente
-        self.device_id = str(SmartDevice.device_counter + 1)
-        SmartDevice.device_counter += 1  # Incrementa o contador para o próximo dispositivo
+        if device_type in SmartDevice.device_ids:
+            self.device_id = SmartDevice.device_ids[device_type]
+        else:
+            raise ValueError(f"Dispositivo {device_type} nao reconhecido!")
 
         self.device_type = device_type
         self.ip = ip
         self.port = port
-        self.gateway_ip = '172.31.103.163'  # Pode ser alterado para o IP real do Gateway
+        self.gateway_ip = '172.24.145.231'  # Pode ser alterado para o IP real do Gateway
         self.gateway_port = 5000
         self.multicast_group = '224.0.0.1'
         self.multicast_port = 10001
