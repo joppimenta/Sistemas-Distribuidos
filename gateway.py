@@ -117,6 +117,7 @@ class Gateway:
 
     def start(self):
         # Etapa de descoberta de dispositivos
+
         self.send_multicast_discovery()
         self.listen_for_device_responses()
 
@@ -134,5 +135,5 @@ class Gateway:
 
 
 if __name__ == "__main__":
-    gateway = Gateway(ip="192.168.18.45", port=5000, multicast_group="224.0.0.1", multicast_port=10001)
+    gateway = Gateway(ip='172.31.103.163', port=5000, multicast_group="224.0.0.1", multicast_port=10001)
     gateway.start()

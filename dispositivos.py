@@ -1,6 +1,5 @@
 import socket
 import system_pb2  # Arquivo gerado a partir de system.proto
-import threading
 
 
 class SmartDevice:
@@ -15,7 +14,7 @@ class SmartDevice:
         self.device_type = device_type
         self.ip = ip
         self.port = port
-        self.gateway_ip = '192.168.18.45'  # Pode ser alterado para o IP real do Gateway
+        self.gateway_ip = '172.31.103.163'  # Pode ser alterado para o IP real do Gateway
         self.gateway_port = 5000
         self.multicast_group = '224.0.0.1'
         self.multicast_port = 10001
@@ -70,19 +69,4 @@ class SmartDevice:
         self.running = False
 
 
-# Inicialização dos dispositivos IOT (sem precisar passar o ID manualmente)
-lamp = SmartDevice('Lampada', 'localhost', 6000)
-sensor = SmartDevice('Sensor', 'localhost', 6001)
-air_conditioner = SmartDevice('Ar-Condicionado', 'localhost', 6002, 25)
-som = SmartDevice('Som', 'localhost', 6003)
 
-# Inicia a escuta de multicast em threads separadas
-lamp_thread = threading.Thread(target=lamp.listen_for_multicast)
-sensor_thread = threading.Thread(target=sensor.listen_for_multicast)
-air_conditioner_thread = threading.Thread(target=air_conditioner.listen_for_multicast)
-som_thread = threading.Thread(target=som.listen_for_multicast)
-
-lamp_thread.start()
-sensor_thread.start()
-air_conditioner_thread.start()
-som_thread.start()
