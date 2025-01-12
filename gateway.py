@@ -11,6 +11,7 @@ class Gateway:
         self.multicast_port = multicast_port
         self.devices = {}  # Dicionário para armazenar dispositivos
         self.lock = threading.Lock()  # Para garantir acesso seguro à lista de dispositivos
+        self.device_timeout = 20  # Tempo em segundos para verificar se o dispositivo está ativo
 
     def send_multicast_discovery(self):
         """Envia uma mensagem multicast para descobrir novos dispositivos."""
@@ -39,14 +40,26 @@ class Gateway:
                     device_info.ParseFromString(data)
 
                     with self.lock:
-                        if device_info.device_id not in self.devices:
-                            self.devices[device_info.device_id] = device_info
-                            print(f"Dispositivo identificado: ID={device_info.device_id}, Tipo={device_info.device_type}")
-                        else:
-                            print(f"Dispositivo {device_info.device_id} já registrado.")
+                        self.devices[device_info.device_id] = {
+                            "info": device_info,
+                            "last_seen": time.time()  # Armazena o tempo da última resposta
+                        }
+                        print(f"Dispositivo identificado: ID={device_info.device_id}, Tipo={device_info.device_type}")
 
                 except socket.timeout:
                     continue
+
+    def check_device_timeout(self):
+        """Verifica periodicamente se algum dispositivo está inativo e remove os inativos."""
+        while True:
+            time.sleep(10)  # Verifica a cada 10 segundos
+            current_time = time.time()
+            with self.lock:
+                for device_id in list(self.devices.keys()):  # Usamos list() para evitar erro durante iteração
+                    last_seen = self.devices[device_id]["last_seen"]
+                    if current_time - last_seen > self.device_timeout:
+                        print(f"Dispositivo {device_id} removido por inatividade.")
+                        del self.devices[device_id]  # Remove o dispositivo inativo
 
     def handle_client(self, client_socket):
         """Lida com a conexão do cliente e responde com a lista de dispositivos ou comandos de controle."""
@@ -60,7 +73,7 @@ class Gateway:
                     # Envia lista de dispositivos conectados
                     with self.lock:
                         devices_list = "\n".join(
-                            [f"ID: {dev.device_id}, Tipo: {dev.device_type}, Estado: {dev.state}"
+                            [f"ID: {dev['info'].device_id}, Tipo: {dev['info'].device_type}, Estado: {dev['info'].state}"
                              for dev in self.devices.values()]
                         )
                     client_socket.sendall(devices_list.encode())
@@ -74,7 +87,7 @@ class Gateway:
 
                     with self.lock:
                         if device_id in self.devices:
-                            device = self.devices[device_id]
+                            device = self.devices[device_id]["info"]
                             if action == "ligar":
                                 device.state = "on"
                             elif action == "desligar":
@@ -101,6 +114,9 @@ class Gateway:
                 time.sleep(10)  # Envia a solicitação de descoberta a cada 10 segundos
 
         threading.Thread(target=send_discovery_periodically, daemon=True).start()
+
+        # Verifica periodicamente os dispositivos inativos
+        threading.Thread(target=self.check_device_timeout, daemon=True).start()
 
         # Inicia o servidor TCP
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
