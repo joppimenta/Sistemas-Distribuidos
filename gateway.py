@@ -49,7 +49,7 @@ class Gateway:
                     continue
 
     def handle_client(self, client_socket):
-        """Handle the client connection and respond with device list or control commands."""
+        """Lida com a conexão do cliente e responde com a lista de dispositivos ou comandos de controle."""
         try:
             while True:
                 data = client_socket.recv(1024)
@@ -94,9 +94,13 @@ class Gateway:
         # O Gateway deve enviar periodicamente mensagens multicast
         threading.Thread(target=self.listen_for_device_responses, daemon=True).start()
 
-        while True:
-            self.send_multicast_discovery()
-            time.sleep(10)  # Envia uma nova solicitação de descoberta a cada 10 segundos
+        # Envio periódico de mensagens multicast para descobrir novos dispositivos
+        def send_discovery_periodically():
+            while True:
+                self.send_multicast_discovery()
+                time.sleep(10)  # Envia a solicitação de descoberta a cada 10 segundos
+
+        threading.Thread(target=send_discovery_periodically, daemon=True).start()
 
         # Inicia o servidor TCP
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
