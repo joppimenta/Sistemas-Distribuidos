@@ -35,7 +35,7 @@ class ClientApp:
         self.device_type_label = tk.Label(self.control_frame, text="Tipo de Dispositivo:")
         self.device_type_label.grid(row=0, column=0, padx=5)
         self.device_type_combobox = ttk.Combobox(
-            self.control_frame, values=["Lâmpada", "Sensor", "Ar-Condicionado"], state="readonly"
+            self.control_frame, values=["Lâmpada", "Torneira", "Ar-Condicionado"], state="readonly"
         )
         self.device_type_combobox.grid(row=0, column=1, padx=5)
         self.device_type_combobox.bind("<<ComboboxSelected>>", self.update_temperature_field)
