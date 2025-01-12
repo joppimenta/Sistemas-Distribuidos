@@ -3,7 +3,7 @@ import system_pb2  # Arquivo gerado a partir de system.proto
 
 
 class SmartDevice:
-    device_ids = {"Sensor": "1", "Som": "2", "Lampada": "3", "Ar-Condicionado": "4"}
+    device_ids = {"Torneira": "1", "Som": "2", "Lampada": "3", "Ar-Condicionado": "4"}
 
     def __init__(self, device_type, ip, port, initial_temperature=None):
         if device_type in SmartDevice.device_ids:
