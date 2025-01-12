@@ -25,7 +25,7 @@ class Gateway:
         """Escuta as respostas dos dispositivos após o multicast de descoberta."""
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as udp_socket:
             udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            udp_socket.bind((self.ip, self.multicast_port))
+            udp_socket.bind((self.ip, 7000))
             print(f"Aguardando respostas dos dispositivos em {self.ip}...")
 
             # Adiciona o socket ao grupo multicast
@@ -91,9 +91,9 @@ class Gateway:
                         if device_id in self.devices:
                             device = self.devices[device_id]['info']
                             if action == "ligar":
-                                device.state = "on"
+                                self.devices[device_id]['info'].state = "on"
                             elif action == "desligar":
-                                device.state = "off"
+                                self.devices[device_id]['info'].state = "off"
 
                             # Controle de temperatura para dispositivos de ar-condicionado
                             if device.device_type == "Ar-Condicionado" and action == "ligar":
@@ -141,5 +141,5 @@ class Gateway:
 
 
 if __name__ == "__main__":
-    gateway = Gateway(ip='172.24.145.231', port=5000, multicast_group="224.0.0.1", multicast_port=10001)
+    gateway = Gateway(ip='192.168.18.45', port=5000, multicast_group="224.0.0.1", multicast_port=10001)
     gateway.start()
