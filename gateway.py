@@ -73,29 +73,39 @@ class Gateway:
                     # Envia lista de dispositivos conectados
                     with self.lock:
                         devices_list = "\n".join(
-                            [f"ID: {dev['info'].device_id}, Tipo: {dev['info'].device_type}, Estado: {dev['info'].state}"
+                            [f"ID: {dev['info'].device_id}, Tipo: {dev['info'].device_type}, Estado: {dev['info'].state}, "
+                             f"Temperatura: {dev['info'].temperature if dev['info'].device_type == 'Ar-Condicionado' else 'N/A'}"
                              for dev in self.devices.values()]
                         )
                     client_socket.sendall(devices_list.encode())
 
                 else:
-                    # Comando de controle de dispositivo
+                    # Recebe comandos de controle de dispositivos
                     device_control = system_pb2.DeviceControl()
                     device_control.ParseFromString(data)
                     device_id = device_control.device_id
                     action = device_control.action
+                    temperature = device_control.temperature
 
                     with self.lock:
                         if device_id in self.devices:
-                            device = self.devices[device_id]["info"]
+                            device = self.devices[device_id]['info']
                             if action == "ligar":
                                 device.state = "on"
                             elif action == "desligar":
                                 device.state = "off"
 
-                            client_socket.sendall(f"Comando {action} para {device_id} executado com sucesso.".encode())
-                        else:
-                            client_socket.sendall(f"Dispositivo {device_id} não encontrado.".encode())
+                            # Controle de temperatura para dispositivos de ar-condicionado
+                            if device.device_type == "Ar-Condicionado" and action == "ligar":
+                                if 16 <= temperature <= 30:
+                                    device.temperature = temperature
+                                    client_socket.sendall(
+                                        f"Ar-condicionado {device_id} ligado com temperatura {temperature}°C.".encode())
+                                else:
+                                    client_socket.sendall(
+                                        f"Temperatura {temperature}°C inválida. Intervalo permitido: 16°C a 30°C.".encode())
+                            else:
+                                client_socket.sendall(f"Dispositivo {device_id} {action} com sucesso.".encode())
 
         except Exception as e:
             print(f"Erro no cliente: {e}")
