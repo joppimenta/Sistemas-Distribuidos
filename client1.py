@@ -64,14 +64,16 @@ class ClientApp:
             if self.socket:
                 self.socket.close()  # Fecha o socket antigo, se existir
             self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.socket.settimeout(5)  # Set a timeout for socket operations
             self.socket.connect((self.gateway_ip, self.gateway_port))
             self.connected = True
             self.status_label.config(text="Status: Conectado ao Gateway", fg="green")
             self.list_devices_button.config(state=tk.NORMAL)
             self.control_button.config(state=tk.NORMAL)
             self.list_devices()  # Listar dispositivos ao conectar
-        except Exception:
+        except (socket.timeout, socket.error) as e:
             self.connected = False
+            messagebox.showerror("Erro", f"Não foi possível conectar ao Gateway: {e}")
 
     def list_devices(self):
         if not self.connected:
@@ -103,11 +105,9 @@ class ClientApp:
                 self.device_type_combobox.current(0)
             else:
                 self.device_type_combobox.set("")
-        except ConnectionError as e:
+        except (ConnectionError, socket.timeout) as e:
             self.connected = False
-            messagebox.showerror("Erro", str(e))
-        except Exception:
-            messagebox.showerror("Erro", "Erro ao listar dispositivos. Verifique a conexão.")
+            messagebox.showerror("Erro", f"Erro ao listar dispositivos: {e}")
 
     def start_reconnection_loop(self):
         def reconnect():
@@ -149,20 +149,22 @@ class ClientApp:
                 temperature=float(temperature) if temperature else 0.0
             )
             self.socket.sendall(control_message.SerializeToString())
+            print("Command sent to Gateway, waiting for response...")
 
             response = self.socket.recv(1024)
-            if not response:  # Se não receber dados, considerar como desconectado
+            if not response:
                 raise ConnectionError("Conexão perdida com o Gateway.")
 
+            print("Response received from Gateway.")
             messagebox.showinfo("Resposta do Gateway", response.decode())
             self.list_devices()
-        except ValueError:
-            messagebox.showerror("Erro", "Temperatura inválida. Insira um número entre 16°C e 30°C.")
-        except ConnectionError as e:
+        except (socket.timeout, ConnectionError) as e:
             self.connected = False
+            messagebox.showerror("Erro", f"Erro de conexão: {e}")
+        except ValueError as e:
             messagebox.showerror("Erro", str(e))
         except Exception as e:
-            messagebox.showerror("Erro", f"Erro ao enviar comando: {e}")
+            messagebox.showerror("Erro", f"Erro inesperado: {e}")
 
     def update_temperature_field(self, event):
         selected_device = self.device_type_combobox.get()
@@ -184,3 +186,4 @@ if __name__ == "__main__":
     app = ClientApp(root, '192.168.0.16', 5000)
     root.protocol("WM_DELETE_WINDOW", app.on_closing)
     root.mainloop()
+
