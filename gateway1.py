@@ -83,29 +83,17 @@ class Gateway:
                     # Recebe comandos de controle de dispositivos
                     device_control = system_pb2.DeviceControl()
                     device_control.ParseFromString(data)
-                    device_id = device_control.device_id
-                    action = device_control.action
-                    temperature = device_control.temperature
 
-                    with self.lock:
-                        if device_id in self.devices:
-                            device = self.devices[device_id]['info']
-                            if action == "ligar":
-                                self.devices[device_id]['info'].state = "on"
-                            elif action == "desligar":
-                                self.devices[device_id]['info'].state = "off"
+                    # Adiciona a string COMMAND_MESSAGE ao início do comando
+                    command_message = b"COMMAND_MESSAGE" + device_control.SerializeToString()
 
-                            # Controle de temperatura para dispositivos de ar-condicionado
-                            if device.device_type == "Ar-Condicionado" and action == "ligar":
-                                if 16 <= temperature <= 30:
-                                    device.temperature = temperature
-                                    client_socket.sendall(
-                                        f"Ar-condicionado {device_id} ligado com temperatura {temperature}°C.".encode())
-                                else:
-                                    client_socket.sendall(
-                                        f"Temperatura {temperature}°C inválida. Intervalo permitido: 16°C a 30°C.".encode())
-                            else:
-                                client_socket.sendall(f"Dispositivo {device_id} {action} com sucesso.".encode())
+                    # Envia a mensagem para o grupo multicast
+                    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP) as multicast_socket:
+                        multicast_socket.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 2)
+                        multicast_socket.sendto(command_message, (self.multicast_group, self.multicast_port))
+
+                    print(f"Comando enviado para o grupo multicast: {command_message}")
+                    client_socket.sendall(b"Command broadcasted to devices.")
 
         except Exception as e:
             print(f"Erro no cliente: {e}")
@@ -143,3 +131,4 @@ class Gateway:
 if __name__ == "__main__":
     gateway = Gateway(ip='192.168.0.16', port=5000, multicast_group="224.0.0.1", multicast_port=10001)
     gateway.start()
+

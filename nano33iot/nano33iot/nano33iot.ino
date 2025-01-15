@@ -4,11 +4,11 @@
 #include "pb_decode.h"
 
 // Define your WiFi credentials
-const char* ssid = "LESC";
-const char* password = "A33669608F";
+const char* ssid = "brisa-2593962";
+const char* password = "cdnf30li";
 
 // Gateway details
-const char* gateway_ip = "192.168.80.93";  // Updated gateway IP
+const char* gateway_ip = "192.168.0.16";  // Updated gateway IP
 const int gateway_port = 7000;  // Gateway port for TCP communication
 
 // Device Info
@@ -39,7 +39,7 @@ void setup() {
     connectToWiFi();
 
     // Populate device info
-    set_string_field(&device_info.device_id, "12345");  // Example device ID
+    set_string_field(&device_info.device_id, "4");  // Example device ID
     set_string_field(&device_info.device_type, "Ar-Condicionado");  // Device type
     set_string_field(&device_info.state, "off");  // Initial state
     device_info.temperature = 20.0;  // Initial temperature

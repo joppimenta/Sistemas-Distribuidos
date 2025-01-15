@@ -14,7 +14,7 @@ class SmartDevice:
         self.device_type = device_type
         self.ip = ip
         self.port = port
-        self.gateway_ip = '192.168.3.120'  # IP do Gateway
+        self.gateway_ip = '192.168.0.16'  # IP do Gateway
         self.gateway_port = 7000  # Porta do Gateway
         self.multicast_group = '224.0.0.1'
         self.multicast_port = 10001
