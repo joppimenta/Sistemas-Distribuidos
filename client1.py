@@ -183,7 +183,7 @@ class ClientApp:
 
 if __name__ == "__main__":
     root = tk.Tk()
-    app = ClientApp(root, '172.31.40.12', 5000)
+    app = ClientApp(root, '172.24.145.231', 5000)
     root.protocol("WM_DELETE_WINDOW", app.on_closing)
     root.mainloop()
 
