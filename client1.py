@@ -146,7 +146,7 @@ class ClientApp:
             control_message = system_pb2.DeviceControl(
                 device_id=device_id,
                 action=action,
-                temperature=float(temperature) if temperature else 0.0
+                temperature=int(temperature) if temperature else 0
             )
             self.socket.sendall(control_message.SerializeToString())
             print("Command sent to Gateway, waiting for response...")
@@ -183,7 +183,7 @@ class ClientApp:
 
 if __name__ == "__main__":
     root = tk.Tk()
-    app = ClientApp(root, '192.168.0.16', 5000)
+    app = ClientApp(root, '192.168.212.93', 5000)
     root.protocol("WM_DELETE_WINDOW", app.on_closing)
     root.mainloop()
 

@@ -10,22 +10,22 @@
 #endif
 
 /* Struct definitions */
-/* Definição de um dispositivo inteligente */
-typedef struct _system_DeviceInfo {
-    pb_callback_t device_id;
-    pb_callback_t device_type;
-    pb_callback_t ip;
-    int32_t port;
-    pb_callback_t state; /* Estado do dispositivo (ligado/desligado) */
-    float temperature; /* Temperatura atual (aplicável ao ar-condicionado) */
-} system_DeviceInfo;
-
 /* Comando de controle de um dispositivo */
 typedef struct _system_DeviceControl {
-    pb_callback_t device_id;
-    pb_callback_t action; /* Ação (ligar/desligar/ajustar_temperatura) */
-    float temperature; /* Temperatura desejada (apenas para ajustar_temperatura) */
+    char device_id[64]; /* Fixed-length string (64 bytes) */
+    char action[64]; /* Fixed-length string (64 bytes) */
+    int32_t temperature; /* Desired temperature as an integer */
 } system_DeviceControl;
+
+/* Definição de um dispositivo inteligente */
+typedef struct _system_DeviceInfo {
+    char device_id[64];
+    char device_type[64];
+    char ip[64];
+    int32_t port;
+    char state[16]; /* Estado do dispositivo (ligado/desligado) */
+    int32_t temperature; /* Current temperature as an integer */
+} system_DeviceInfo;
 
 
 #ifdef __cplusplus
@@ -33,50 +33,51 @@ extern "C" {
 #endif
 
 /* Initializer values for message structs */
-#define system_DeviceInfo_init_default           {{{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}, 0, {{NULL}, NULL}, 0}
-#define system_DeviceControl_init_default        {{{NULL}, NULL}, {{NULL}, NULL}, 0}
-#define system_DeviceInfo_init_zero              {{{NULL}, NULL}, {{NULL}, NULL}, {{NULL}, NULL}, 0, {{NULL}, NULL}, 0}
-#define system_DeviceControl_init_zero           {{{NULL}, NULL}, {{NULL}, NULL}, 0}
+#define system_DeviceControl_init_default        {"", "", 0}
+#define system_DeviceInfo_init_default           {"", "", "", 0, "", 0}
+#define system_DeviceControl_init_zero           {"", "", 0}
+#define system_DeviceInfo_init_zero              {"", "", "", 0, "", 0}
 
 /* Field tags (for use in manual encoding/decoding) */
+#define system_DeviceControl_device_id_tag       1
+#define system_DeviceControl_action_tag          2
+#define system_DeviceControl_temperature_tag     3
 #define system_DeviceInfo_device_id_tag          1
 #define system_DeviceInfo_device_type_tag        2
 #define system_DeviceInfo_ip_tag                 3
 #define system_DeviceInfo_port_tag               4
 #define system_DeviceInfo_state_tag              5
 #define system_DeviceInfo_temperature_tag        6
-#define system_DeviceControl_device_id_tag       1
-#define system_DeviceControl_action_tag          2
-#define system_DeviceControl_temperature_tag     3
 
 /* Struct field encoding specification for nanopb */
-#define system_DeviceInfo_FIELDLIST(X, a) \
-X(a, CALLBACK, SINGULAR, STRING,   device_id,         1) \
-X(a, CALLBACK, SINGULAR, STRING,   device_type,       2) \
-X(a, CALLBACK, SINGULAR, STRING,   ip,                3) \
-X(a, STATIC,   SINGULAR, INT32,    port,              4) \
-X(a, CALLBACK, SINGULAR, STRING,   state,             5) \
-X(a, STATIC,   SINGULAR, FLOAT,    temperature,       6)
-#define system_DeviceInfo_CALLBACK pb_default_field_callback
-#define system_DeviceInfo_DEFAULT NULL
-
 #define system_DeviceControl_FIELDLIST(X, a) \
-X(a, CALLBACK, SINGULAR, STRING,   device_id,         1) \
-X(a, CALLBACK, SINGULAR, STRING,   action,            2) \
-X(a, STATIC,   SINGULAR, FLOAT,    temperature,       3)
-#define system_DeviceControl_CALLBACK pb_default_field_callback
+X(a, STATIC,   SINGULAR, STRING,   device_id,         1) \
+X(a, STATIC,   SINGULAR, STRING,   action,            2) \
+X(a, STATIC,   SINGULAR, INT32,    temperature,       3)
+#define system_DeviceControl_CALLBACK NULL
 #define system_DeviceControl_DEFAULT NULL
 
-extern const pb_msgdesc_t system_DeviceInfo_msg;
+#define system_DeviceInfo_FIELDLIST(X, a) \
+X(a, STATIC,   SINGULAR, STRING,   device_id,         1) \
+X(a, STATIC,   SINGULAR, STRING,   device_type,       2) \
+X(a, STATIC,   SINGULAR, STRING,   ip,                3) \
+X(a, STATIC,   SINGULAR, INT32,    port,              4) \
+X(a, STATIC,   SINGULAR, STRING,   state,             5) \
+X(a, STATIC,   SINGULAR, INT32,    temperature,       6)
+#define system_DeviceInfo_CALLBACK NULL
+#define system_DeviceInfo_DEFAULT NULL
+
 extern const pb_msgdesc_t system_DeviceControl_msg;
+extern const pb_msgdesc_t system_DeviceInfo_msg;
 
 /* Defines for backwards compatibility with code written before nanopb-0.4.0 */
-#define system_DeviceInfo_fields &system_DeviceInfo_msg
 #define system_DeviceControl_fields &system_DeviceControl_msg
+#define system_DeviceInfo_fields &system_DeviceInfo_msg
 
 /* Maximum encoded size of messages (where known) */
-/* system_DeviceInfo_size depends on runtime parameters */
-/* system_DeviceControl_size depends on runtime parameters */
+#define SYSTEM_SYSTEM_PB_H_MAX_SIZE              system_DeviceInfo_size
+#define system_DeviceControl_size                141
+#define system_DeviceInfo_size                   234
 
 #ifdef __cplusplus
 } /* extern "C" */

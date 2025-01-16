@@ -14,7 +14,7 @@ message DeviceInfo {
 
 // Comando de controle de um dispositivo
 message DeviceControl {
-    string device_id = 1;
-    string action = 2;  // Ação (ligar/desligar/ajustar_temperatura)
-    float temperature = 3; // Temperatura desejada (apenas para ajustar_temperatura)
+    string device_id = 1 [(nanopb).max_size = 64]; // Fixed-length string (64 bytes)
+    string action = 2 [(nanopb).max_size = 64];    // Fixed-length string (64 bytes)
+    int32 temperature = 3; // Temperatura desejada (integer value)
 }

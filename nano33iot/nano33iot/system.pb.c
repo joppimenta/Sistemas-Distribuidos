@@ -6,10 +6,10 @@
 #error Regenerate this file with the current version of nanopb generator.
 #endif
 
-PB_BIND(system_DeviceInfo, system_DeviceInfo, AUTO)
-
-
 PB_BIND(system_DeviceControl, system_DeviceControl, AUTO)
+
+
+PB_BIND(system_DeviceInfo, system_DeviceInfo, AUTO)
 
 
 

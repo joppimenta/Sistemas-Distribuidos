@@ -4,32 +4,16 @@
 #include "pb_decode.h"
 
 // Define your WiFi credentials
-const char* ssid = "brisa-2593962";
-const char* password = "cdnf30li";
+const char* ssid = "Danilo";
+const char* password = "daniloab";
 
 // Gateway details
-const char* gateway_ip = "192.168.0.16";  // Updated gateway IP
+const char* gateway_ip = "192.168.212.93";  // Updated gateway IP
 const int gateway_port = 7000;  // Gateway port for TCP communication
 
 // Device Info
-system_DeviceInfo device_info = system_DeviceInfo_init_default;
+system_DeviceInfo device_info = system_DeviceInfo_init_zero;
 WiFiUDP udp;
-
-// Helper function to set string fields in Nanopb
-bool set_string_field(pb_callback_t* field, const char* value) {
-    field->funcs.encode = &pb_encode_string;
-    field->arg = (void*)value;
-    return true;
-}
-
-// Callback function for encoding strings in Nanopb
-bool pb_encode_string(pb_ostream_t* stream, const pb_field_t* field, void* const* arg) {
-    const char* str = (const char*)(*arg);
-    if (!pb_encode_tag_for_field(stream, field)) {
-        return false;
-    }
-    return pb_encode_string(stream, (uint8_t*)str, strlen(str));
-}
 
 void setup() {  
     Serial.begin(115200);
@@ -39,22 +23,20 @@ void setup() {
     connectToWiFi();
 
     // Populate device info
-    set_string_field(&device_info.device_id, "4");  // Example device ID
-    set_string_field(&device_info.device_type, "Ar-Condicionado");  // Device type
-    set_string_field(&device_info.state, "off");  // Initial state
-    device_info.temperature = 20.0;  // Initial temperature
+    strncpy(device_info.device_id, "4", sizeof(device_info.device_id));
+    strncpy(device_info.device_type, "Ar-Condicionado", sizeof(device_info.device_type));
+    strncpy(device_info.state, "off", sizeof(device_info.state));
+    device_info.temperature = 20;  // Initial temperature
 
     // Start listening for multicast discovery
     if (udp.beginMulticast(IPAddress(224, 0, 0, 1), 10001)) {
-    Serial.println("UDP multicast started successfully.");
-    } 
-    else {
+        Serial.println("UDP multicast started successfully.");
+    } else {
         Serial.println("Failed to start UDP multicast.");
     }
 }
 
 void loop() {
-    // Handle UDP commands (both discovery and control)
     handleUDPCommands();
 }
 
@@ -81,36 +63,64 @@ void handleUDPCommands() {
         }
         Serial.println();
 
-        // Convert buffer to a string to check if it's a DISCOVER_DEVICES message
+        // Convert buffer to a string to check prefixes
         char receivedMessage[packetSize + 1];
         memset(receivedMessage, 0, packetSize + 1);
         memcpy(receivedMessage, buffer, packetSize);
 
         // Check if the message is DISCOVER_DEVICES
         if (strcmp(receivedMessage, "DISCOVER_DEVICES") == 0) {
-            // Handle the DISCOVER_DEVICES message (send device info back)
             sendDeviceInfo();
             Serial.println("Responded to multicast discovery.");
-            return;  // Skip control message processing
+            return;  // Skip further processing
         }
 
-        // Handle the control message (turn on/off lamp, change temperature)
-        system_DeviceControl control = system_DeviceControl_init_default;
-        pb_istream_t stream = pb_istream_from_buffer(buffer, packetSize);
+        // Check if the message is COMMAND_MESSAGE
+        if (strncmp(receivedMessage, "COMMAND_MESSAGE", 15) == 0) {
+            const uint8_t* protobufData = buffer + 15; // Skip the prefix
+            size_t protobufLength = packetSize - 15;
+            handleCommandMessage(protobufData, protobufLength);
+        }
+    }
+}
 
-        if (pb_decode(&stream, system_DeviceControl_fields, &control)) {
-            const char* action = (const char*)(control.action.arg);
-            if (strcmp(action, "ligar") == 0) {
-                set_string_field(&device_info.state, "on");
-                device_info.temperature = control.temperature;
-                Serial.println("Lamp turned on.");
-            } else if (strcmp(action, "desligar") == 0) {
-                set_string_field(&device_info.state, "off");
-                Serial.println("Lamp turned off.");
-            }
+void handleCommandMessage(const uint8_t* data, size_t length) {
+    // Parse Protobuf message
+    pb_istream_t stream = pb_istream_from_buffer(data, length);
+    system_DeviceControl control = system_DeviceControl_init_zero;
+
+    if (!pb_decode(&stream, system_DeviceControl_fields, &control)) {
+        Serial.print("Decode error: ");
+        Serial.println(PB_GET_ERROR(&stream));
+        return;
+    }
+
+    // Log decoded fields
+    Serial.print("Decoded device_id: ");
+    Serial.println(control.device_id);
+
+    Serial.print("Decoded action: ");
+    Serial.println(control.action);
+
+    Serial.print("Decoded temperature: ");
+    Serial.println(control.temperature);
+
+    // Process the command if intended for this device
+    if (strcmp(control.device_id, device_info.device_id) == 0) {
+        Serial.println("Command intended for this device.");
+
+        if (strcmp(control.action, "ligar") == 0) {
+            strncpy(device_info.state, "on", sizeof(device_info.state));
+            device_info.temperature = control.temperature;
+            Serial.println("Device turned on.");
+        } else if (strcmp(control.action, "desligar") == 0) {
+            strncpy(device_info.state, "off", sizeof(device_info.state));
+            Serial.println("Device turned off.");
         } else {
-            Serial.println("Failed to decode control message.");
+            Serial.println("Unknown action received.");
         }
+    } else {
+        Serial.println("Command not intended for this device.");
     }
 }
 
