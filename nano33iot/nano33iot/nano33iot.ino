@@ -18,7 +18,9 @@ WiFiUDP udp;
 void setup() {  
     Serial.begin(115200);
     while (!Serial);
-
+    
+    pinMode(LED_BUILTIN, OUTPUT);
+    
     // Connect to WiFi
     connectToWiFi();
 
@@ -80,6 +82,7 @@ void handleUDPCommands() {
             const uint8_t* protobufData = buffer + 15; // Skip the prefix
             size_t protobufLength = packetSize - 15;
             handleCommandMessage(protobufData, protobufLength);
+            sendDeviceInfo();
         }
     }
 }
@@ -113,12 +116,14 @@ void handleCommandMessage(const uint8_t* data, size_t length) {
             strncpy(device_info.state, "on", sizeof(device_info.state));
             device_info.temperature = control.temperature;
             Serial.println("Device turned on.");
+            digitalWrite(LED_BUILTIN, HIGH);
         } else if (strcmp(control.action, "desligar") == 0) {
             strncpy(device_info.state, "off", sizeof(device_info.state));
             Serial.println("Device turned off.");
+            digitalWrite(LED_BUILTIN, LOW);
         } else {
             Serial.println("Unknown action received.");
-        }
+        } 
     } else {
         Serial.println("Command not intended for this device.");
     }
