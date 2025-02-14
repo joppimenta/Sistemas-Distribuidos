@@ -8,7 +8,7 @@ const char* ssid = "Danilo";
 const char* password = "daniloab";
 
 // Gateway details
-const char* gateway_ip = "192.168.212.93";  // Updated gateway IP
+const char* gateway_ip = "192.168.124.93";  // Updated gateway IP
 const int gateway_port = 5000;  // Gateway port for TCP communication
 
 WiFiClient client;
@@ -24,7 +24,7 @@ void setup() {
     while (!Serial);
 
     // Configure the button pin as input with pull-up
-    pinMode(buttonPin, INPUT);
+    pinMode(buttonPin, INPUT_PULLUP);
 
     // Connect to WiFi
     connectToWiFi();
@@ -113,15 +113,15 @@ void loop() {
     buttonState = digitalRead(buttonPin);
 
     // Send a command on button press
-    if (buttonState == HIGH && lastButtonState == LOW) { // Detect button press (active low)
+    if (buttonState == LOW && lastButtonState == HIGH) { // Detect button press (active low)
         if (device_on == false){
           sendControlCommand("4", "ligar"); // Example: Turn on a device with ID "3"
-          device_on == true;
+          device_on = true;
           Serial.println("Button pressed! Sending command 'ligar'.");
         }
         else if (device_on == true){
           sendControlCommand("4", "desligar"); // Example: Turn on a device with ID "3"
-          device_on == false;
+          device_on = false;
           Serial.println("Button pressed! Sending command 'desligar'.");
         }
     }

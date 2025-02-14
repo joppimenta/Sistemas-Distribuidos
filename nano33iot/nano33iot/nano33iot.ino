@@ -8,7 +8,7 @@ const char* ssid = "Danilo";
 const char* password = "daniloab";
 
 // Gateway details
-const char* gateway_ip = "192.168.212.93";  // Updated gateway IP
+const char* gateway_ip = "192.168.124.93";  // Updated gateway IP
 const int gateway_port = 7000;  // Gateway port for TCP communication
 
 // Device Info
