@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Dispositivos</title>
+    <script defer src="script.js"></script>
+</head>
+<body>
+
+    <h2>Controle de Dispositivos</h2>
+
+    <label for="device_name">Escolha um dispositivo para controlar:</label>
+    <select id="device_name">
+        <option value="Lâmpada">Lâmpada</option>
+        <option value="Ar-condicionado">Ar-condicionado</option>
+        <option value="Ventilador">Ventilador</option>
+    </select>
+
+    <br><br>
+
+    <button onclick="consultarEstado()">Consultar Estado</button>
+    <button onclick="ligarDispositivo()">Ligar</button>
+    <button onclick="desligarDispositivo()">Desligar</button>
+
+    <br><br>
+    <label for="config">Configuração:</label>
+    <input type="text" id="config" placeholder="Ex: temperatura=25">
+    <button onclick="configurarDispositivo()">Configurar</button>
+
+    <pre id="response"></pre>
+
+</body>
+</html>
