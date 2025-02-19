@@ -1,37 +1,44 @@
-import pika
+import paho.mqtt.client as mqtt
+import system_pb2  # Importa a definição do Protobuf
 import time
 import random
-import system_pb2  # Importa Protobuf para estrutura de mensagens
 from config import BROKER_HOST, BROKER_USER, BROKER_PASSWORD
 
-QUEUE_NAME = "sensor_temperatura"
+# Configuração do MQTT
+TOPIC = "sensor/temperatura"
+MQTT_PORT = 1883
 
-def publish_temperature():
-    credentials = pika.PlainCredentials(BROKER_USER, BROKER_PASSWORD)
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host=BROKER_HOST, credentials=credentials))
-    channel = connection.channel()
+# Função para conectar ao MQTT Broker
+def connect_mqtt():
+    client = mqtt.Client()
+    client.username_pw_set(BROKER_USER, BROKER_PASSWORD)
+    client.connect(BROKER_HOST, MQTT_PORT, 60)
+    return client
 
-    # Criar a fila como durável (mensagens persistentes)
-    channel.queue_declare(queue=QUEUE_NAME, durable=True)
-
+# Função para gerar e publicar leituras simuladas
+def publish_temperature(client):
     while True:
-        temperature = random.uniform(18.0, 30.0)  # Simula um sensor real
-        message = system_pb2.DeviceInfo(
-            device_type="sensor_temperatura",
-            ip="192.168.1.10",
-            port=5001,
-            state=str(temperature),
-        )
+        # Gerar uma temperatura entre 20°C e 30°C
+        temperature = round(random.uniform(20.0, 30.0), 2)
 
-        channel.basic_publish(
-            exchange="",
-            routing_key=QUEUE_NAME,
-            body=message.SerializeToString(),
-            properties=pika.BasicProperties(delivery_mode=2)  # Mensagem persistente
-        )
+        # Criar a mensagem Protobuf
+        message = system_pb2.SensorData()
+        message.device_type = "sensor_temperatura"
+        message.sensor_id = "temp_01"
+        message.value = temperature
+        message.unit = "°C"
+        message.timestamp = int(time.time())  # Timestamp UNIX
 
-        print(f"[SENSOR TEMPERATURA] Publicou: {temperature}°C")
-        time.sleep(10)  # Publica a cada 10 segundos
+        # Serializar a mensagem
+        serialized_message = message.SerializeToString()
 
+        # Publicar no tópico MQTT
+        client.publish(TOPIC, serialized_message)
+        print(f"[SENSOR] Publicado: {temperature}°C no tópico {TOPIC}")
+
+        time.sleep(5)  # Publica a cada 5 segundos
+
+# Configuração e execução do sensor
 if __name__ == "__main__":
-    publish_temperature()
+    client = connect_mqtt()
+    publish_temperature(client)

@@ -2,7 +2,8 @@ import paho.mqtt.client as mqtt
 import system_pb2  # Importa Protobuf
 from config import BROKER_HOST, BROKER_USER, BROKER_PASSWORD
 
-TOPIC = "sensor/luminosidade"  # Certifique-se de que é o mesmo usado no Arduino
+# Lista de tópicos que o Gateway irá escutar
+TOPICS = [("sensor/luminosidade", 0), ("sensor/temperatura", 0)]  # 0 = QoS
 
 class Gateway:
     def __init__(self):
@@ -18,15 +19,19 @@ class Gateway:
         try:
             self.client.connect(BROKER_HOST, 1883, 60)
             print("[GATEWAY] Conectado ao MQTT Broker")
-            self.client.subscribe(TOPIC)
+
+            # Assina múltiplos tópicos
+            self.client.subscribe(TOPICS)
+            print(f"[GATEWAY] Inscrito nos tópicos: {[t[0] for t in TOPICS]}")
+
         except Exception as e:
             print(f"[ERRO] Falha ao conectar ao MQTT Broker: {e}")
 
     def process_sensor_data(self, client, userdata, message):
         """Processa dados recebidos dos sensores (em Protobuf)."""
         try:
-            data = message.payload  # Mantemos os dados como bytes (NÃO FAÇA `.decode()`)
-            print(f"[GATEWAY] Mensagem recebida (bruta): {data}")
+            data = message.payload  # Mantemos os dados como bytes
+            #print(f"[GATEWAY] Mensagem recebida do tópico {message.topic}: {data}")
 
             # Criar objeto Protobuf
             sensor_message = system_pb2.SensorData()

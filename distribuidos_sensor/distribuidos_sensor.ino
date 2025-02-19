@@ -11,10 +11,10 @@ const char* ssid = "LESC";
 const char* password = "A33669608F";
 
 // MQTT Broker details
-const char* mqtt_server = "192.168.15.102";  // IP do Broker MQTT (RabbitMQ)
+const char* mqtt_server = "192.168.3.120";  // IP do Broker MQTT (RabbitMQ)
 const int mqtt_port = 1883;
-const char* mqtt_user = "clara";
-const char* mqtt_password = "clara";
+const char* mqtt_user = "dan";
+const char* mqtt_password = "dan";
 const char* mqtt_topic = "sensor/luminosidade";  // Novo formato de tópico
 
 WiFiClient wifiClient;
