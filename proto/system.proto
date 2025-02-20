@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package system;
+
+import "nanopb.proto"; // Import necessário para Nanopb
+
+// ======================== [ MENSAGEM PARA SENSORES (MQTT) ] ========================
+message SensorData {
+  string device_type = 1 [(nanopb).max_length = 32]; // Exemplo: "sensor_temperatura"
+  string sensor_id = 2 [(nanopb).max_length = 16];  // Identificador único do sensor
+  float value = 3;  // Valor do sensor (exemplo: temperatura, umidade, luminosidade)
+  string unit = 4 [(nanopb).max_length = 8];  // Unidade de medida (°C, %, lux)
+  int64 timestamp = 5;  // Timestamp da leitura (opcional)
+}
+
+// ======================== [ MENSAGEM PARA ATUADORES (gRPC) ] ========================
+message ActuatorCommand {
+  string device_type = 1 [(nanopb).max_length = 32]; // Exemplo: "lampada", "motor"
+  string actuator_id = 2 [(nanopb).max_length = 16]; // Identificador único do atuador
+  string action = 3 [(nanopb).max_length = 16]; // Exemplo: "ligar", "desligar"
+  int32 value = 4;  // Parâmetro opcional (exemplo: intensidade da luz, velocidade)
+}
+
+// ======================== [ RESPOSTA DO ATUADOR PARA O GATEWAY ] ========================
+message ActuatorResponse {
+  string actuator_id = 1 [(nanopb).max_length = 16]; // Identificador único do atuador
+  string status = 2 [(nanopb).max_length = 16]; // Exemplo: "ligado", "desligado"
+}
+
+// ======================== [ SERVIÇO gRPC PARA ATUADORES ] ========================
+service Actuator {
+  rpc ExecuteCommand (ActuatorCommand) returns (ActuatorResponse);
+}
+
