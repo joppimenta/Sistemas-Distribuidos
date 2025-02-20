@@ -7,11 +7,11 @@
 const int LDR_PIN = A0;  // Pino do sensor de luminosidade
 
 // WiFi credentials
-const char* ssid = "LESC";
-const char* password = "A33669608F";
+const char* ssid = "Danilo";
+const char* password = "daniloab";
 
 // MQTT Broker details
-const char* mqtt_server = "192.168.3.120";  // IP do Broker MQTT (RabbitMQ)
+const char* mqtt_server = "192.168.229.93";  // IP do Broker MQTT (RabbitMQ)
 const int mqtt_port = 1883;
 const char* mqtt_user = "dan";
 const char* mqtt_password = "dan";

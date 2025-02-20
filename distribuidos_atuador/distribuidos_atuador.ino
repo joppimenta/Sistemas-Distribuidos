@@ -4,8 +4,8 @@ const int LED_PIN = B10;  // Simula um atuador (ex: lâmpada)
 
 // WiFi credentials
 // WiFi credentials
-const char* ssid = "LESC";
-const char* password = "A33669608F";
+const char* ssid = "Danilo";
+const char* password = "daniloab";
 
 // Servidor TCP para receber comandos do Gateway
 WiFiServer server(50051);
