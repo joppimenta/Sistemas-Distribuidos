@@ -5,6 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Controle de Dispositivos</title>
     <script defer src="script.js"></script>
+    <style>
+        pre {
+            background: #f4f4f4;
+            padding: 10px;
+            border: 1px solid #ccc;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
 </head>
 <body>
 
@@ -28,7 +37,8 @@
     <input type="text" id="config" placeholder="Ex: temperatura=25">
     <button onclick="configurarDispositivo()">Configurar</button>
 
-    <pre id="response"></pre>
+    <h3>Resposta da API:</h3>
+    <pre id="response">Aguardando resposta...</pre>
 
 </body>
 </html>

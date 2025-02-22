@@ -24,7 +24,7 @@ async function configurarDispositivo() {
     const response = await fetch(`${API_URL}/${nome}/configurar`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ config })
+        body: JSON.stringify({valor: config })
     });
     document.getElementById("response").innerText = await response.text();
 }

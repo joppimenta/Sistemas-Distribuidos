@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package actuator;
+
+// Serviço gRPC para os atuadores
+service Actuator {
+  rpc Ligar (CommandRequest) returns (CommandResponse);
+  rpc Desligar (CommandRequest) returns (CommandResponse);
+}
+
+// Mensagem de requisição enviada pelo Gateway
+message CommandRequest {
+  string device_type = 1; // Tipo de dispositivo (lampada, ar-condicionado, etc)
+}
+
+// Mensagem de resposta enviada pelo Atuador
+message CommandResponse {
+  string status = 1; // Estado do dispositivo após o comando (Ligado/Desligado)
+}
