@@ -21,9 +21,8 @@
 
     <label for="device_name">Escolha um dispositivo para controlar:</label>
     <select id="device_name">
-        <option value="Lâmpada">Lâmpada</option>
-        <option value="Ar-condicionado">Ar-condicionado</option>
-        <option value="Ventilador">Ventilador</option>
+        <option value="lampada">lampada</option>
+        <option value="motor">motor</option>
     </select>
 
     <br><br>
@@ -34,7 +33,7 @@
 
     <br><br>
     <label for="config">Configuração:</label>
-    <input type="text" id="config" placeholder="Ex: temperatura=25">
+    <input type="text" id="config" placeholder="Ex: valor=25">
     <button onclick="configurarDispositivo()">Configurar</button>
 
     <h3>Resposta da API:</h3>
