@@ -3,41 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Controle de Dispositivos</title>
+    <title>Monitoramento e Controle</title>
     <script defer src="{{ url_for('static', filename='script.js') }}"></script>
     <style>
-        pre {
-            background: #f4f4f4;
-            padding: 10px;
-            border: 1px solid #ccc;
-            white-space: pre-wrap;
-            word-wrap: break-word;
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f8f9fa;
+            margin: 20px;
+        }
+        h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .container {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .box {
+            font-size: 20px;
+            font-weight: bold;
+            background: #eef;
+            padding: 20px;
+            border-radius: 10px;
+            min-width: 220px;
+            text-align: center;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .box small {
+            display: block;
+            margin-top: 5px;
+            font-size: 14px;
+            color: #666;
+        }
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+            margin-top: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+        }
+        button:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
 <body>
 
-    <h2>Controle de Dispositivos</h2>
+    <h2>Monitoramento de Sensores</h2>
 
-    <label for="device_name">Escolha um dispositivo para controlar:</label>
-    <select id="device_name">
-        <option value="lampada">lampada</option>
-        <option value="motor">motor</option>
-    </select>
+    <div class="container">
+        <div id="sensor-temperatura" class="box">Temperatura: Aguardando...</div>
+        <div id="sensor-luminosidade" class="box">Luminosidade: Aguardando...</div>
+    </div>
 
-    <br><br>
+    <h2>Controle de Atuadores</h2>
 
-    <button onclick="consultarEstado()">Consultar Estado</button>
-    <button onclick="ligarDispositivo()">Ligar</button>
-    <button onclick="desligarDispositivo()">Desligar</button>
-
-    <br><br>
-    <label for="config">Configuração:</label>
-    <input type="text" id="config" placeholder="Ex: valor=25">
-    <button onclick="configurarDispositivo()">Configurar</button>
-
-    <h3>Resposta da API:</h3>
-    <pre id="response">Aguardando resposta...</pre>
+    <div class="container">
+        <div class="box">
+            <h3>Lâmpada</h3>
+            <div class="button-container">
+                <button onclick="controlarAtuador('lampada', 'ligar')">Ligar</button>
+                <button onclick="controlarAtuador('lampada', 'desligar')">Desligar</button>
+            </div>
+        </div>
+    </div>
 
 </body>
 </html>
