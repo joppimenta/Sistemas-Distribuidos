@@ -8,20 +8,20 @@ async function consultarEstado() {
 
 async function ligarDispositivo() {
     const nome = document.getElementById("device_name").value;
-    const response = await fetch(`${API_URL}/${nome}/ligar`, { method: "POST" });
+    const response = await fetch(`${API_URL}/dispositivos/${nome}/ligar`, { method: "POST" });
     document.getElementById("response").innerText = await response.text();
 }
 
 async function desligarDispositivo() {
     const nome = document.getElementById("device_name").value;
-    const response = await fetch(`${API_URL}/${nome}/desligar`, { method: "POST" });
+    const response = await fetch(`${API_URL}/dispositivos/${nome}/desligar`, { method: "POST" });
     document.getElementById("response").innerText = await response.text();
 }
 
 async function configurarDispositivo() {
     const nome = document.getElementById("device_name").value;
     const config = document.getElementById("config").value;
-    const response = await fetch(`${API_URL}/${nome}/configurar`, {
+    const response = await fetch(`${API_URL}/dispositivos/${nome}/configurar`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({valor: config })

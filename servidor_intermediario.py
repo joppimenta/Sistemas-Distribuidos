@@ -5,7 +5,7 @@ import socket
 from concurrent import futures
 
 # Configuração do Atuador (Arduino)
-ACTUATOR_IP = "192.168.229.82"
+ACTUATOR_IP = "192.168.240.82"
 ACTUATOR_PORT = 50051
 
 class AtuadorService(system_pb2_grpc.ActuatorServicer):
